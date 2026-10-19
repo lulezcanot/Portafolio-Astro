@@ -1,0 +1,96 @@
+---
+// Sello dibujado para cada caso. Es material provisional: reemplázalo por capturas reales cuando las tengas.
+interface Props {
+  kind: 'cart' | 'quiz' | 'lock' | 'chart' | 'neural' | 'atom';
+  stamp: string;
+  year: string;
+  size?: number;
+  id: string;
+}
+const { kind, stamp, year, size = 120, id } = Astro.props;
+const ringId = `ring-${id}`;
+const label = stamp.toUpperCase();
+---
+
+<svg class="mark" viewBox="0 0 120 120" width={size} height={size} role="img" aria-label={`Sello: ${stamp}, ${year}`}>
+  <defs>
+    <path id={ringId} d="M60 60 m-47 0 a47 47 0 1 1 94 0 a47 47 0 1 1 -94 0"></path>
+  </defs>
+  <circle cx="60" cy="60" r="57" fill="none" stroke="currentColor" stroke-width="3.5"></circle>
+  <circle cx="60" cy="60" r="36" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"></circle>
+  <text class="mark__text" fill="currentColor">
+    <textPath href={`#${ringId}`} startOffset="2%" textLength="282">{label} · {year} · {label} ·</textPath>
+  </text>
+  <g fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="square" stroke-linejoin="miter">
+    {
+      kind === 'cart' && (
+        <>
+          <path d="M42 46h6l5 20h20l5-14H50" />
+          <circle cx="56" cy="74" r="2.6" fill="currentColor" stroke="none" />
+          <circle cx="72" cy="74" r="2.6" fill="currentColor" stroke="none" />
+        </>
+      )
+    }
+    {
+      kind === 'quiz' && (
+        <>
+          <path d="M46 52c0-9 28-9 28 0 0 8-14 8-14 17" />
+          <rect x="57.5" y="75" width="5" height="5" fill="currentColor" stroke="none" />
+        </>
+      )
+    }
+    {
+      kind === 'lock' && (
+        <>
+          <rect x="46" y="58" width="28" height="20" />
+          <path d="M51 58v-7a9 9 0 0 1 18 0v7" />
+        </>
+      )
+    }
+    {
+      kind === 'chart' && (
+        <>
+          <path d="M44 78h32" />
+          <path d="M49 78V64M60 78V50M71 78V58" />
+        </>
+      )
+    }
+    {
+      kind === 'neural' && (
+        <>
+          <path d="M47 50l26 10M47 70l26-10M47 50l26 20M47 70l26-20" stroke-width="1.8" />
+          <circle cx="47" cy="50" r="4.5" fill="currentColor" stroke="none" />
+          <circle cx="47" cy="70" r="4.5" fill="currentColor" stroke="none" />
+          <circle cx="73" cy="60" r="4.5" fill="currentColor" stroke="none" />
+          <circle cx="73" cy="50" r="3.5" fill="currentColor" stroke="none" />
+          <circle cx="73" cy="70" r="3.5" fill="currentColor" stroke="none" />
+        </>
+      )
+    }
+    {
+      kind === 'atom' && (
+        <>
+          <ellipse cx="60" cy="62" rx="17" ry="7" stroke-width="2.4" />
+          <ellipse cx="60" cy="62" rx="17" ry="7" stroke-width="2.4" transform="rotate(60 60 62)" />
+          <ellipse cx="60" cy="62" rx="17" ry="7" stroke-width="2.4" transform="rotate(120 60 62)" />
+          <circle cx="60" cy="62" r="3.4" fill="currentColor" stroke="none" />
+        </>
+      )
+    }
+  </g>
+</svg>
+
+<style>
+  .mark {
+    flex: none;
+    transform: rotate(-8deg);
+    color: var(--ink);
+    opacity: 0.9;
+  }
+  .mark__text {
+    font-family: var(--font-label), monospace;
+    font-weight: 700;
+    font-size: 9.2px;
+    letter-spacing: 0.04em;
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+// Código de barras decorativo, determinista por semilla (no codifica datos reales).
+interface Props {
+  seed: string;
+  height?: number;
+  label?: string;
+}
+const { seed, height = 44, label } = Astro.props;
+
+let h = 2166136261;
+for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+const bars: { x: number; w: number }[] = [];
+let x = 0;
+let i = 0;
+while (x < 220) {
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  const w = 1 + (Math.abs(h) % 4);
+  const gap = 1 + (Math.abs(h >> 5) % 3);
+  if (i % 2 === 0) bars.push({ x, w });
+  x += i % 2 === 0 ? w : gap;
+  i++;
+}
+const width = x;
+---
+
+<figure class="barcode" aria-hidden="true">
+  <svg viewBox={`0 0 ${width} 40`} preserveAspectRatio="none" style={`height:${height}px`}>
+    {bars.map((b) => <rect x={b.x} y="0" width={b.w} height="40" fill="currentColor" />)}
+  </svg>
+  {label && <figcaption class="data">{label}</figcaption>}
+</figure>
+
+<style>
+  .barcode {
+    margin: 0;
+    display: grid;
+    gap: 0.3rem;
+    width: min(100%, 15rem);
+  }
+  svg {
+    width: 100%;
+  }
+  figcaption {
+    letter-spacing: 0.12em;
+  }
+</style>

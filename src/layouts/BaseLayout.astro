@@ -1,0 +1,86 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/global.css';
+import { profile } from '../data/profile';
+
+interface Props {
+  title?: string;
+  description?: string;
+  scene?: boolean;
+  bodyClass?: string;
+}
+
+const {
+  title = `${profile.name} · ${profile.role}`,
+  description = profile.summary,
+  scene = false,
+  bodyClass = '',
+} = Astro.props;
+
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site) : undefined;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ff5a1f" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_PE" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta name="twitter:card" content="summary" />
+    <Font cssVariable="--font-display" preload />
+    <Font cssVariable="--font-body" preload />
+    <Font cssVariable="--font-label" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    <slot name="head" />
+  </head>
+  <body class={bodyClass} data-scene={scene ? 'on' : 'off'}>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+    {scene && <div class="scene" id="scene" aria-hidden="true"><canvas id="scene-canvas"></canvas></div>}
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  .skip {
+    position: fixed;
+    top: 0.75rem;
+    left: 0.75rem;
+    z-index: 100;
+    padding: 0.6rem 1rem;
+    background: var(--ink);
+    color: var(--board);
+    text-decoration: none;
+    transform: translateY(-200%);
+    transition: transform var(--dur-ui) var(--ease-out);
+  }
+  .skip:focus {
+    transform: none;
+  }
+  .scene {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .scene canvas {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 600ms var(--ease-out);
+  }
+  .scene.is-ready canvas {
+    opacity: 1;
+  }
+</style>

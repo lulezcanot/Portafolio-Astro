@@ -1,0 +1,179 @@
+---
+import { experience, timeline } from '../data/profile';
+---
+
+<section class="path on-board seam" id="trayectoria">
+  <div class="path__inner">
+    <h2 class="path__title">Trayectoria</h2>
+
+    <div class="path__grid">
+      <div class="work">
+        <h3 class="work__company">Consultora Transformación Digital S.A.C.</h3>
+        <ol class="work__roles">
+          {
+            experience.map((e, i) => (
+              <li class="role" data-reveal style={`--i:${i}`}>
+                <p class="role__when data">
+                  {e.from} – {e.to}
+                </p>
+                <p class="role__name">{e.role}</p>
+                <ul class="role__points">
+                  {e.points.map((p) => (
+                    <li>{p}</li>
+                  ))}
+                </ul>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <ol class="track" data-track aria-label="Línea de tiempo">
+        <span class="track__rail" aria-hidden="true"><span class="track__fill" data-track-fill></span></span>
+        {
+          timeline.map((t, i) => (
+            <li class:list={['stop', { 'stop--now': i === timeline.length - 1 }]} data-reveal style={`--i:${i % 3}`}>
+              <span class="stop__dot" aria-hidden="true"></span>
+              <p class="stop__year">{t.year}</p>
+              <p class="stop__text">{t.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .path {
+    --seam: var(--tape);
+    position: relative;
+    background: var(--board);
+    color: var(--ink);
+    padding: clamp(5rem, 10vw, 8rem) var(--gutter);
+  }
+  .path__inner {
+    max-width: 82rem;
+    margin: 0 auto;
+  }
+  .path__title {
+    font-size: var(--step-4);
+    margin-bottom: clamp(2rem, 5vw, 4rem);
+  }
+  .path__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(2.5rem, 7vw, 6rem);
+    align-items: start;
+  }
+
+  .work__company {
+    font-size: var(--step-2);
+    line-height: 0.95;
+    padding-bottom: 1rem;
+    border-bottom: 4px solid var(--ink);
+  }
+  .role {
+    padding: 1.4rem 0 1.6rem;
+    border-bottom: 2px solid var(--ink);
+    display: grid;
+    gap: 0.5rem;
+  }
+  .role__when {
+    font-weight: 700;
+    color: var(--film);
+  }
+  .role__name {
+    font-family: var(--font-display), sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: var(--step-1);
+    line-height: 1;
+  }
+  .role__points {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: 0.4rem;
+    max-width: 56ch;
+  }
+  .role__points li {
+    padding-left: 1.2rem;
+    position: relative;
+  }
+  .role__points li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.6rem;
+    height: 3px;
+    background: var(--ink);
+  }
+
+  /* Seguimiento: la trayectoria como historial de un paquete */
+  .track {
+    position: relative;
+    display: grid;
+    gap: 1.8rem;
+    padding-left: 2.2rem;
+  }
+  .track__rail {
+    position: absolute;
+    left: 0.4rem;
+    top: 0.6rem;
+    bottom: 0.6rem;
+    width: 4px;
+    background: repeating-linear-gradient(to bottom, var(--ink) 0 6px, transparent 6px 12px);
+    opacity: 0.35;
+  }
+  .track__fill {
+    position: absolute;
+    inset: 0;
+    background: var(--ink);
+    transform-origin: top;
+    transform: scaleY(var(--fill, 1));
+    opacity: 1;
+  }
+  .stop {
+    position: relative;
+  }
+  .stop__dot {
+    position: absolute;
+    left: -2.2rem;
+    top: 0.35rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    background: var(--board);
+    border: 4px solid var(--ink);
+  }
+  .stop--now .stop__dot {
+    background: var(--tape);
+    animation: ping 2.4s var(--ease-out) infinite;
+  }
+  @keyframes ping {
+    0% {
+      box-shadow: 0 0 0 0 rgb(255 90 31 / 0.6);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 0.9rem rgb(255 90 31 / 0);
+    }
+  }
+  .stop__year {
+    font-family: var(--font-display), sans-serif;
+    font-weight: 900;
+    font-size: var(--step-2);
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+  .stop__text {
+    max-width: 40ch;
+    margin-top: 0.25rem;
+  }
+
+  @media (max-width: 900px) {
+    .path__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

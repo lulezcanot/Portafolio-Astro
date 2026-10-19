@@ -1,0 +1,297 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import Barcode from '../../components/Barcode.astro';
+import route66 from '../../assets/img/route66.png';
+import { profile } from '../../data/profile';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({
+    params: { slug: project.id },
+    props: { project, index: i, total: projects.length, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+const { project, index, total, next } = Astro.props;
+const { Content } = await render(project);
+const d = project.data;
+const covers: Record<string, ImageMetadata> = { 'route66-big-data': route66 };
+const cover = covers[project.id];
+---
+
+<BaseLayout title={`${d.title} · ${profile.name}`} description={d.summary}>
+  <Nav home={false} />
+  <main id="contenido" class="case">
+    <article class="case__inner">
+      <header class="case__head">
+        <p class="case__bar data">
+          <span>
+            Bulto {index + 1}/{total}
+          </span>
+          <span>{d.year}</span>
+        </p>
+        <h1 class="case__title" style={`view-transition-name: ticket-${project.id}`}>{d.title}</h1>
+        <p class="case__summary">{d.summary}</p>
+      </header>
+
+      <div class="case__grid">
+        <dl class="case__fields">
+          <div>
+            <dt class="data">Remitente</dt>
+            <dd>{d.context}</dd>
+          </div>
+          <div>
+            <dt class="data">Rol</dt>
+            <dd>{d.role}</dd>
+          </div>
+          <div>
+            <dt class="data">Contenido</dt>
+            <dd>
+              <ul>
+                {d.contents.map((c) => <li>+ {c}</li>)}
+              </ul>
+            </dd>
+          </div>
+          <div>
+            <dt class="data">Tecnologías</dt>
+            <dd>
+              <ul class="chips">
+                {d.stack.map((s) => <li class="data">{s}</li>)}
+              </ul>
+            </dd>
+          </div>
+        </dl>
+
+        <div class="case__body">
+          {
+            cover && (
+              <figure class="case__cover">
+                <Image src={cover} alt="Portada del proyecto Route66" widths={[480, 720]} sizes="(max-width: 900px) 90vw, 480px" />
+                <figcaption class="data">Imagen del portafolio anterior</figcaption>
+              </figure>
+            )
+          }
+          <div class="prose"><Content /></div>
+          {d.note && <p class="note data">{d.note}</p>}
+          <div class="case__links">
+            {
+              d.links.repo && (
+                <a class="btn" href={d.links.repo} target="_blank" rel="noopener noreferrer">
+                  Ver el código
+                  <span class="sr-only"> (abre en una pestaña nueva)</span>
+                </a>
+              )
+            }
+            {
+              d.links.demo && (
+                <a class="btn" href={d.links.demo} target="_blank" rel="noopener noreferrer">
+                  Ver en vivo
+                  <span class="sr-only"> (abre en una pestaña nueva)</span>
+                </a>
+              )
+            }
+            <a class="btn btn--ghost" href="/#casos">Todos los casos</a>
+          </div>
+        </div>
+      </div>
+
+      <footer class="case__foot">
+        <Barcode seed={project.id} height={42} label={`LLT-${String(index + 1).padStart(4, '0')}`} />
+        <a class="next" href={`/proyectos/${next.id}/`}>
+          <span class="data">Siguiente bulto</span>
+          <span class="next__t">{next.data.title}</span>
+        </a>
+      </footer>
+    </article>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .case {
+    background: var(--tape);
+    padding: 7rem var(--gutter) clamp(4rem, 8vw, 6rem);
+    min-height: 100svh;
+  }
+  .case__inner {
+    max-width: 62rem;
+    margin: 0 auto;
+    background: var(--board);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 0 22px 40px -26px rgb(17 17 17 / 0.8);
+  }
+  .case__bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1.2rem;
+    background: var(--ink);
+    color: var(--board);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .case__head {
+    display: grid;
+    gap: 1rem;
+    padding-bottom: clamp(1.5rem, 3vw, 2.4rem);
+    border-bottom: 3px solid var(--ink);
+  }
+  .case__head > :not(.case__bar) {
+    margin-inline: clamp(1.2rem, 3vw, 2.4rem);
+  }
+  .case__title {
+    font-size: var(--step-4);
+    margin-top: clamp(1.2rem, 3vw, 2.2rem);
+    width: fit-content;
+  }
+  .case__summary {
+    font-size: var(--step-1);
+    line-height: 1.4;
+    max-width: 46ch;
+    font-weight: 700;
+  }
+  .case__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+  }
+  .case__fields {
+    margin: 0;
+    border-right: 3px solid var(--ink);
+  }
+  .case__fields > div {
+    padding: 1rem clamp(1.2rem, 2.4vw, 1.8rem);
+    border-bottom: 1px dashed var(--ink);
+  }
+  .case__fields dt {
+    opacity: 0.7;
+    margin-bottom: 0.3rem;
+  }
+  .case__fields dd {
+    margin: 0;
+    font-weight: 700;
+    display: grid;
+    gap: 0.2rem;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .chips li {
+    padding: 0.2rem 0.55rem;
+    border: 2px solid var(--ink);
+  }
+  .case__body {
+    padding: clamp(1.2rem, 3vw, 2.2rem);
+    display: grid;
+    gap: 1.4rem;
+    align-content: start;
+  }
+  .case__cover {
+    margin: 0;
+    border: 2px solid var(--ink);
+  }
+  .case__cover img {
+    width: 100%;
+    height: auto;
+    filter: grayscale(1) contrast(1.1);
+    mix-blend-mode: multiply;
+  }
+  .case__cover figcaption {
+    padding: 0.35rem 0.6rem;
+    border-top: 2px solid var(--ink);
+    opacity: 0.75;
+  }
+  .prose {
+    max-width: 52ch;
+    font-size: var(--step-0);
+  }
+  .note {
+    padding: 0.6rem 0.8rem;
+    border: 2px dashed var(--ink);
+    font-weight: 700;
+  }
+  .case__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+  .btn {
+    display: inline-flex;
+    padding: 0.8rem 1.2rem;
+    background: var(--ink);
+    color: var(--board);
+    text-decoration: none;
+    font-family: var(--font-display), sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    line-height: 1;
+    border: 3px solid var(--ink);
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      background-color var(--dur-ui) var(--ease-out),
+      color var(--dur-ui) var(--ease-out);
+  }
+  .btn--ghost {
+    background: transparent;
+    color: var(--ink);
+  }
+  .btn:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover {
+      background: var(--tape);
+      color: var(--ink);
+    }
+  }
+  .case__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.4rem;
+    padding: 1.2rem clamp(1.2rem, 3vw, 2.4rem) 1.4rem;
+    border-top: 3px solid var(--ink);
+  }
+  .next {
+    display: grid;
+    gap: 0.2rem;
+    text-decoration: none;
+    text-align: right;
+  }
+  .next .data {
+    opacity: 0.7;
+  }
+  .next__t {
+    font-family: var(--font-display), sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: var(--step-2);
+    line-height: 1;
+    text-decoration: underline;
+    text-decoration-thickness: 4px;
+    text-underline-offset: 0.18em;
+    text-decoration-color: var(--tape);
+    transition: text-decoration-color var(--dur-ui) var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .next:hover .next__t {
+      text-decoration-color: var(--ink);
+    }
+  }
+  @media (max-width: 800px) {
+    .case__grid {
+      grid-template-columns: 1fr;
+    }
+    .case__fields {
+      border-right: 0;
+      border-bottom: 3px solid var(--ink);
+    }
+  }
+</style>

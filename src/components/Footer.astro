@@ -1,0 +1,96 @@
+---
+import { profile } from '../data/profile';
+const year = new Date().getFullYear();
+---
+
+<footer class="foot on-ink">
+  <div class="foot__inner">
+    <p class="foot__name">{profile.name}</p>
+    <p class="foot__meta data">
+      <span>{profile.city}</span>
+      <span aria-hidden="true">·</span>
+      <span>Hora local <time data-clock datetime="">--:--</time></span>
+    </p>
+    <p class="foot__meta data">
+      <span>© {year}</span>
+      <span aria-hidden="true">·</span>
+      <span>Hecho con Astro y Three.js</span>
+    </p>
+    <a class="foot__top data" href="#inicio" data-top>Volver arriba
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square"><path d="M12 20V5M5 11l7-7 7 7" /></svg>
+    </a>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    background: var(--ink);
+    color: var(--board);
+    border-top: 4px solid var(--tape);
+    padding: 2rem var(--gutter) 2.4rem;
+  }
+  .foot__inner {
+    max-width: 82rem;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.8rem 2rem;
+  }
+  .foot__name {
+    font-family: var(--font-display), sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: var(--step-2);
+    line-height: 1;
+    margin-right: auto;
+  }
+  .foot__meta {
+    display: flex;
+    gap: 0.6rem;
+    font-weight: 700;
+  }
+  .foot__top {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 0.4rem 0.7rem;
+    border: 2px solid var(--board);
+    transition:
+      background-color var(--dur-ui) var(--ease-out),
+      color var(--dur-ui) var(--ease-out),
+      transform var(--dur-press) var(--ease-out);
+  }
+  .foot__top:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .foot__top:hover {
+      background: var(--tape);
+      border-color: var(--tape);
+      color: var(--ink);
+    }
+  }
+</style>
+
+<script>
+  const clock = document.querySelector<HTMLTimeElement>('[data-clock]');
+  if (clock) {
+    const fmt = new Intl.DateTimeFormat('es-PE', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'America/Lima',
+    });
+    const tick = () => {
+      const now = new Date();
+      clock.textContent = fmt.format(now);
+      clock.dateTime = now.toISOString();
+    };
+    tick();
+    setInterval(tick, 20_000);
+  }
+</script>

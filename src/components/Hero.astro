@@ -1,0 +1,274 @@
+---
+import { profile } from '../data/profile';
+
+const facts = [profile.role, profile.roleDetail, profile.city];
+---
+
+<section class="hero on-tape" id="inicio" data-hero>
+  <div class="hero__inner">
+    <div class="hero__copy">
+      <div class="hero__table">
+        <h1 class="hero__name" aria-label={profile.name}>
+          {
+            profile.nameLines.map((w, i) => (
+              <span class="line" aria-hidden="true">
+                <span class="line__in" style={`--i:${i}`}>
+                  {w}
+                </span>
+              </span>
+            ))
+          }
+        </h1>
+        <ul class="hero__facts">
+          {
+            facts.map((f, i) => (
+              <li>
+                <span class="line__in" style={`--i:${i + 3}`}>
+                  {f}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="hero__actions" data-reveal style="--i:6">
+        <p class="status data">
+          <span class="status__dot" aria-hidden="true"></span>
+          {profile.availability}
+        </p>
+        <div class="hero__buttons">
+          <a class="tape-btn" href="#casos">
+            <span>Ver casos</span>
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
+              <path d="M12 4v15M5 13l7 7 7-7"></path>
+            </svg>
+          </a>
+          <a class="text-link" href="#contacto">Escríbeme</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__box" data-box="hero" data-fold="1" data-close="1" data-seal="1" data-ry="-32" data-size="1.08">
+      <svg class="box-poster" viewBox="0 0 400 360" role="img" aria-label="Caja de cartón con la etiqueta de Luis Lezcano Tirado">
+        <ellipse cx="200" cy="318" rx="150" ry="22" fill="#111" opacity=".25"></ellipse>
+        <polygon points="200,60 340,120 340,260 200,320 60,260 60,120" fill="#ebe9df" stroke="#111" stroke-width="3" stroke-linejoin="round"></polygon>
+        <polygon points="200,60 340,120 200,180 60,120" fill="#f6f4ec" stroke="#111" stroke-width="3" stroke-linejoin="round"></polygon>
+        <polygon points="200,180 340,120 340,260 200,320" fill="#d9d6c9" stroke="#111" stroke-width="3" stroke-linejoin="round"></polygon>
+        <polygon points="190,76 238,97 108,153 60,132" fill="#2f5bff" opacity=".92"></polygon>
+        <polygon points="226,222 318,183 318,242 226,281" fill="#fbfaf5" stroke="#111" stroke-width="2"></polygon>
+        <g fill="#111">
+          <rect x="236" y="196" width="46" height="5"></rect>
+          <rect x="236" y="208" width="68" height="5"></rect>
+          <rect x="236" y="244" width="3" height="22"></rect>
+          <rect x="243" y="244" width="6" height="22"></rect>
+          <rect x="253" y="244" width="2" height="22"></rect>
+          <rect x="259" y="244" width="5" height="22"></rect>
+          <rect x="268" y="244" width="3" height="22"></rect>
+          <rect x="275" y="244" width="7" height="22"></rect>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    padding: 6.5rem var(--gutter) 2.5rem;
+    display: grid;
+    align-items: center;
+    background: var(--tape);
+  }
+  .hero__inner {
+    width: 100%;
+    max-width: 82rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: 2rem;
+    align-items: center;
+  }
+  .hero__copy {
+    display: grid;
+    gap: 2.2rem;
+  }
+
+  .hero__table {
+    --row: calc(var(--step-4) * 0.92);
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 1.6rem;
+    border-top: 4px solid var(--ink);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--row) - 4px),
+      var(--ink) calc(var(--row) - 4px) var(--row)
+    );
+  }
+  .hero__name {
+    font-size: var(--step-4);
+    line-height: 0.92;
+    letter-spacing: -0.005em;
+  }
+  .line {
+    display: block;
+    height: var(--row);
+    overflow: hidden;
+  }
+  .line__in {
+    display: block;
+    transform: translateY(0);
+  }
+  .hero__facts {
+    display: grid;
+    grid-auto-rows: var(--row);
+  }
+  .hero__facts li {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    font-family: var(--font-display), sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: var(--step-1);
+    line-height: 1;
+    letter-spacing: 0.01em;
+  }
+
+  :global(.js) .hero:not(.is-in) .line__in {
+    transform: translateY(105%);
+  }
+  :global(.js) .line__in {
+    transition: transform 760ms var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+
+  .hero__actions {
+    display: grid;
+    gap: 1.2rem;
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: fit-content;
+    padding: 0.45rem 0.8rem;
+    background: var(--board);
+    border: 2px solid var(--ink);
+    font-weight: 700;
+  }
+  .status__dot {
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--film);
+    animation: pulse 2.2s var(--ease-out) infinite;
+  }
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgb(47 91 255 / 0.55);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 0.6rem rgb(47 91 255 / 0);
+    }
+  }
+  .hero__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.6rem;
+  }
+
+  .tape-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 1.6rem 1.35rem;
+    background: var(--ink);
+    color: var(--board);
+    text-decoration: none;
+    font-family: var(--font-display), sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: 1.65rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      background-color var(--dur-ui) var(--ease-out),
+      color var(--dur-ui) var(--ease-out);
+  }
+  .tape-btn::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 0.4rem;
+    background: repeating-linear-gradient(135deg, var(--tape) 0 4px, var(--ink) 4px 8px);
+  }
+  .tape-btn svg {
+    transition: transform var(--dur-ui) var(--ease-out);
+  }
+  .tape-btn:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .tape-btn:hover svg {
+      transform: translateY(4px);
+    }
+    .tape-btn:hover {
+      background: var(--board);
+      color: var(--ink);
+      outline: 3px solid var(--ink);
+      outline-offset: -3px;
+    }
+  }
+  .text-link {
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  /* Cartel de respaldo si no hay WebGL o antes de que cargue la escena */
+  .hero__box {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 36rem);
+    aspect-ratio: 1.05;
+  }
+  .box-poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 500ms var(--ease-out);
+  }
+  :global([data-scene='ready']) .box-poster {
+    opacity: 0;
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      padding-top: 5.5rem;
+      align-items: center;
+    }
+    .hero__inner {
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
+    }
+    .hero__box {
+      order: -1;
+      width: min(100%, 25rem);
+      aspect-ratio: 1.2;
+    }
+    .hero__copy {
+      gap: 1.6rem;
+    }
+    .hero__facts li {
+      font-size: 0.95rem;
+      line-height: 0.95;
+    }
+  }
+</style>

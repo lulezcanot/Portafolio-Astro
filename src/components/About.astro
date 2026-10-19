@@ -1,0 +1,184 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/img/Lezcanoimg.jpg';
+import { profile } from '../data/profile';
+
+const statement = 'Interfaces dinámicas, eficientes y pensadas para quien las usa.'.split(' ');
+---
+
+<section class="about on-ink seam" id="sobre-mi">
+  <div class="about__inner">
+    <h2 class="about__statement" data-words aria-label={statement.join(' ')}>
+      {
+        statement.map((w) => (
+          <span class="w" aria-hidden="true">
+            {w}
+          </span>
+        ))
+      }
+    </h2>
+
+    <div class="about__body">
+      <figure class="id" data-reveal>
+        <div class="id__head data">Ficha de remitente</div>
+        <Image
+          class="id__photo"
+          src={portrait}
+          alt="Luis Lezcano Tirado"
+          widths={[240, 360, 480]}
+          sizes="(max-width: 900px) 40vw, 240px"
+          loading="lazy"
+        />
+        <dl class="id__data data">
+          <div><dt>Nombre</dt><dd>{profile.name}</dd></div>
+          <div><dt>Perfil</dt><dd>Ing. de Sistemas</dd></div>
+          <div><dt>UCV</dt><dd>2021 – 2025</dd></div>
+          <div><dt>Origen</dt><dd>{profile.city}</dd></div>
+        </dl>
+      </figure>
+
+      <div class="about__text">
+        {
+          profile.about.map((p, i) => (
+            <p data-reveal style={`--i:${i + 1}`}>
+              {p}
+            </p>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="about__box" data-box="about" data-fold="1" data-close="-0.45" data-slip="1" data-ry="-18" data-size="0.92" aria-hidden="true"></div>
+  </div>
+</section>
+
+<style>
+  .about {
+    --seam: var(--tape);
+    position: relative;
+    background: var(--ink);
+    color: var(--board);
+    padding: clamp(5rem, 11vw, 9rem) var(--gutter);
+  }
+  .about__inner {
+    max-width: 82rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: 3rem;
+    row-gap: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .about__statement {
+    grid-column: 1 / -1;
+    font-size: var(--step-4);
+    max-width: 14ch;
+    line-height: 0.9;
+  }
+  .w {
+    display: inline-block;
+    margin-right: 0.22em;
+  }
+  .about__body {
+    grid-column: 1;
+    display: grid;
+    grid-template-columns: minmax(10rem, 13rem) minmax(0, 1fr);
+    gap: 2.2rem;
+    align-items: start;
+  }
+  .about__box {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: stretch;
+    min-height: 22rem;
+  }
+
+  .about__text {
+    display: grid;
+    gap: 1.2rem;
+    max-width: var(--measure);
+    font-size: var(--step-0);
+  }
+  .about__text p:first-child {
+    font-size: var(--step-1);
+    line-height: 1.35;
+    font-weight: 700;
+  }
+
+  .id {
+    margin: 0;
+    background: var(--board);
+    color: var(--ink);
+    border: 2px solid var(--board);
+  }
+  .id__head {
+    background: var(--tape);
+    color: var(--ink);
+    padding: 0.4rem 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+  .id__photo {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: 50% 20%;
+    filter: grayscale(1) contrast(1.12);
+    mix-blend-mode: multiply;
+    border-bottom: 2px solid var(--ink);
+  }
+  .id__data {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+  .id__data div {
+    display: grid;
+    grid-template-columns: 4.2rem 1fr;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px dashed var(--ink);
+    font-size: 0.72rem;
+    line-height: 1.25;
+  }
+  .id__data div:last-child {
+    border-bottom: 0;
+  }
+  .id__data dt {
+    opacity: 0.72;
+  }
+  .id__data dd {
+    margin: 0;
+    font-weight: 700;
+  }
+
+  :global(.word-dim) {
+    opacity: 0.18;
+  }
+
+  @media (max-width: 900px) {
+    .about__inner {
+      grid-template-columns: 1fr;
+    }
+    .about__body {
+      grid-template-columns: 8.5rem minmax(0, 1fr);
+      gap: 1.2rem;
+    }
+    .about__box {
+      grid-column: 1;
+      grid-row: auto;
+      min-height: 17rem;
+      order: 2;
+    }
+    .about__statement {
+      max-width: none;
+    }
+  }
+  @media (max-width: 560px) {
+    .about__body {
+      grid-template-columns: 1fr;
+    }
+    .id {
+      max-width: 13rem;
+    }
+  }
+</style>

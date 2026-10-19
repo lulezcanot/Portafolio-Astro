@@ -1,0 +1,235 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --font-display: var(--font-display);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-label);
+}
+
+:root {
+  /* Despacho: banco de empaque de una tienda online */
+  --tape: #ff5a1f; /* cinta de embalaje */
+  --tape-deep: #e8430b;
+  --board: #f3f2ec; /* cartón troquelado / etiqueta */
+  --board-dim: #d9d7cd;
+  --ink: #111111; /* tinta térmica */
+  --ink-soft: #2a2927;
+  --film: #2f5bff; /* film de paleta: solo estados y enlaces sobre cartón */
+  --film-light: #8aa4ff; /* mismo azul para fondos de tinta */
+
+  --on-tape: var(--ink);
+  --on-ink: var(--board);
+
+  /* Movimiento: curvas fuertes, nada de ease-in para UI */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-press: 120ms;
+  --dur-ui: 200ms;
+  --dur-reveal: 560ms;
+
+  --gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --measure: 62ch;
+
+  --step--1: clamp(0.78rem, 0.74rem + 0.18vw, 0.875rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.1rem + 0.7vw, 1.65rem);
+  --step-2: clamp(1.7rem, 1.3rem + 1.8vw, 2.6rem);
+  --step-3: clamp(2.6rem, 1.6rem + 4.2vw, 5rem);
+  --step-4: clamp(3rem, 1.5rem + 6.4vw, 6rem); /* tope de display */
+
+  color-scheme: light;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--tape);
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--tape);
+  color: var(--on-tape);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.55;
+  font-weight: 500;
+  overflow-x: clip;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display), 'Arial Narrow', sans-serif;
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 0.09em;
+  text-underline-offset: 0.2em;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* Superficies del navegador que también llevan el diseño */
+::selection {
+  background: var(--ink);
+  color: var(--tape);
+}
+.on-ink ::selection,
+.on-board ::selection {
+  background: var(--tape);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.on-ink :focus-visible {
+  outline-color: var(--tape);
+}
+
+input,
+textarea {
+  caret-color: var(--tape-deep);
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink) var(--tape);
+}
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--tape);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink);
+  border: 2px solid var(--tape);
+  border-radius: 8px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Datos de etiqueta: la fuente mono solo para datos y mediciones */
+.data {
+  font-family: var(--font-label), ui-monospace, monospace;
+  font-size: var(--step--1);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums slashed-zero;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+/* Perforación de etiqueta entre secciones: el color de arriba muerde el de abajo */
+.seam::before {
+  content: '';
+  position: absolute;
+  inset: -1px 0 auto 0;
+  height: 11px;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(circle at 12px 0, var(--seam) 0 8.5px, transparent 9px) 0 0 / 24px 11px repeat-x;
+}
+
+/* Revelado: estado visible por defecto, la animación solo se activa con JS */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity var(--dur-reveal) var(--ease-out),
+    transform var(--dur-reveal) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Transiciones de vista nativas entre páginas */
+@view-transition {
+  navigation: auto;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

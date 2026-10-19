@@ -1,0 +1,398 @@
+---
+import { getCollection } from 'astro:content';
+import Barcode from './Barcode.astro';
+import ProjectMark from './ProjectMark.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const n = projects.length;
+---
+
+<section class="cases on-tape seam" id="casos" data-cases style={`--n:${n}`}>
+  <div class="cases__pin">
+    <div class="cases__side">
+      <h2 class="cases__title">Casos</h2>
+      <ol class="cases__index" aria-label="Índice de casos">
+        {
+          projects.map((p, i) => (
+            <li>
+              <button type="button" data-goto={i} class="idx" aria-label={`Ir al caso ${i + 1}: ${p.data.title}`}>
+                <span class="idx__n data">{String(i + 1).padStart(2, '0')}</span>
+                <span class="idx__t">{p.data.title}</span>
+              </button>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="cases__box" data-box="casos" data-fold="1" data-close="1" data-ry="-28" data-size="0.88" aria-hidden="true"></div>
+    </div>
+
+    <div class="cases__stack" data-stack>
+      {
+        projects.map((p, i) => (
+          <article class="ticket" data-ticket={i} id={`caso-${p.id}`}>
+            <header class="ticket__bar data">
+              <span>
+                Bulto {i + 1}/{n}
+              </span>
+              <span>{p.data.year}</span>
+            </header>
+            <div class="ticket__body" data-print>
+              <h3 class="ticket__title">
+                <a href={`/proyectos/${p.id}/`} style={`view-transition-name: ticket-${p.id}`}>
+                  {p.data.title}
+                </a>
+              </h3>
+              <div class="ticket__lead">
+                <p class="ticket__summary">{p.data.summary}</p>
+                <ProjectMark kind={p.data.mark} stamp={p.data.stamp} year={p.data.year} id={p.id} size={116} />
+              </div>
+              <dl class="ticket__fields">
+                <div>
+                  <dt class="data">Remitente</dt>
+                  <dd>{p.data.context}</dd>
+                </div>
+                <div>
+                  <dt class="data">Rol</dt>
+                  <dd>{p.data.role}</dd>
+                </div>
+                <div class="wide">
+                  <dt class="data">Contenido</dt>
+                  <dd>
+                    <ul class="ticket__contents">
+                      {p.data.contents.map((c) => (
+                        <li>{c}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+              </dl>
+              <ul class="ticket__stack">
+                {p.data.stack.map((s) => (
+                  <li class="data">{s}</li>
+                ))}
+              </ul>
+            </div>
+            <footer class="ticket__foot">
+              <Barcode seed={p.id} height={38} label={`LLT-${String(i + 1).padStart(4, '0')}`} />
+              <div class="ticket__links">
+                <a class="go" href={`/proyectos/${p.id}/`}>
+                  Ver el caso
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square">
+                    <path d="M4 12h15M13 6l6 6-6 6" />
+                  </svg>
+                </a>
+                {p.data.links.repo && (
+                  <a class="ext" href={p.data.links.repo} target="_blank" rel="noopener noreferrer">
+                    Código
+                    <span class="sr-only"> (abre en una pestaña nueva)</span>
+                  </a>
+                )}
+              </div>
+            </footer>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cases {
+    --seam: var(--ink);
+    position: relative;
+    background: var(--tape);
+    padding: clamp(4.5rem, 9vw, 7rem) var(--gutter);
+  }
+
+  .cases__pin {
+    max-width: 82rem;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    column-gap: clamp(1.5rem, 4vw, 4rem);
+  }
+  .cases__title {
+    font-size: var(--step-4);
+    margin-bottom: 1.6rem;
+  }
+  .cases__side {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .cases__index {
+    display: grid;
+    border-top: 3px solid var(--ink);
+  }
+  .idx {
+    all: unset;
+    box-sizing: border-box;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.55rem 0.2rem;
+    cursor: pointer;
+    border-bottom: 3px solid var(--ink);
+    transition:
+      transform var(--dur-ui) var(--ease-out),
+      opacity var(--dur-ui) var(--ease-out),
+      background-color var(--dur-ui) var(--ease-out);
+  }
+  .idx__t {
+    font-family: var(--font-display), sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: var(--step-1);
+    line-height: 1;
+  }
+  .idx:focus-visible {
+    outline: 3px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .idx:active {
+    transform: scale(0.98);
+  }
+  /* Etiquetas ya vistas: quedan como talones atenuados */
+  .idx[data-state='seen'] {
+    opacity: 0.72;
+    border-bottom-style: dashed;
+  }
+  .idx[data-state='active'] {
+    background: var(--ink);
+    color: var(--board);
+    transform: translateX(0.55rem);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .idx:not([data-state='active']):hover {
+      background: rgb(17 17 17 / 0.1);
+    }
+  }
+
+  .cases__box {
+    flex: 1;
+    min-height: 10rem;
+    margin-top: 1rem;
+  }
+
+  .cases__stack {
+    display: grid;
+    gap: 1.6rem;
+  }
+
+  .ticket {
+    background: var(--board);
+    color: var(--ink);
+    border: 3px solid var(--ink);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    box-shadow: 0 18px 34px -22px rgb(17 17 17 / 0.7);
+    will-change: transform;
+  }
+  .ticket__bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: var(--ink);
+    color: var(--board);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .ticket__body {
+    padding: clamp(1.1rem, 2.4vw, 1.9rem);
+    display: grid;
+    gap: 1.1rem;
+    align-content: start;
+  }
+  .ticket__title {
+    font-size: clamp(2.2rem, 4.2vw, 3.8rem);
+    line-height: 0.9;
+  }
+  .ticket__title a {
+    text-decoration: none;
+  }
+  .ticket__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  .ticket {
+    position: relative;
+  }
+  .ticket__lead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+  }
+  .ticket__summary {
+    max-width: 52ch;
+    font-size: var(--step-0);
+  }
+  .ticket__fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: 0;
+    border-top: 2px solid var(--ink);
+  }
+  .ticket__fields > div {
+    padding: 0.55rem 0.8rem 0.6rem 0;
+    border-bottom: 1px dashed var(--ink);
+  }
+  .ticket__fields .wide {
+    grid-column: 1 / -1;
+  }
+  .ticket__fields dt {
+    opacity: 0.7;
+    margin-bottom: 0.15rem;
+  }
+  .ticket__fields dd {
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .ticket__contents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 1.4rem;
+    font-weight: 500;
+  }
+  .ticket__contents li::before {
+    content: '+ ';
+    font-weight: 700;
+  }
+  .ticket__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .ticket__stack li {
+    padding: 0.2rem 0.55rem;
+    border: 2px solid var(--ink);
+    font-weight: 700;
+  }
+  .ticket__foot {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.9rem clamp(1.1rem, 2.4vw, 1.9rem) 1.1rem;
+    border-top: 3px solid var(--ink);
+  }
+  .ticket__links {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    font-weight: 700;
+  }
+  .go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.9rem;
+    background: var(--ink);
+    color: var(--board);
+    text-decoration: none;
+    transition:
+      transform var(--dur-press) var(--ease-out),
+      background-color var(--dur-ui) var(--ease-out),
+      color var(--dur-ui) var(--ease-out);
+  }
+  .go svg {
+    transition: transform var(--dur-ui) var(--ease-out);
+  }
+  .go:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ticket:hover .go svg {
+      transform: translateX(4px);
+    }
+    .go:hover {
+      background: var(--tape);
+      color: var(--ink);
+    }
+  }
+  .ext {
+    color: var(--film);
+    text-decoration-thickness: 2px;
+  }
+
+  /* Impresión de la etiqueta cuando se activa: revelado a pasos, como una térmica */
+  @media (prefers-reduced-motion: no-preference) {
+    .ticket.is-printing .ticket__body {
+      animation: print 780ms steps(16, end) both;
+    }
+  }
+  @keyframes print {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  /* Escritorio: pila fija que se reemplaza con el scroll */
+  @media (min-width: 901px) and (min-height: 600px) and (prefers-reduced-motion: no-preference) {
+    .cases {
+      /* alto = una pantalla de pin + un tramo por cada caso extra */
+      height: calc(100svh + (var(--n) - 1) * 70svh);
+      padding-block: 0;
+    }
+    .cases__pin {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      padding-block: 5.5rem 2rem;
+      align-items: stretch;
+      overflow-y: clip;
+    }
+    .cases__title {
+      font-size: var(--step-3);
+      margin-bottom: 1rem;
+    }
+    .idx {
+      padding-block: 0.4rem;
+    }
+    .cases__stack {
+      position: relative;
+      display: block;
+    }
+    .ticket {
+      position: absolute;
+      inset: 0 0 auto 0;
+      max-height: 100%;
+      min-height: min(30rem, 100%);
+      transform-origin: 50% 100%;
+    }
+  }
+
+  @media (max-width: 900px), (max-height: 599px), (prefers-reduced-motion: reduce) {
+    .cases__pin {
+      grid-template-columns: 1fr;
+      row-gap: 2rem;
+    }
+    .cases__index,
+    .cases__box {
+      display: none;
+    }
+    .cases__title {
+      margin-bottom: 0;
+    }
+    .ticket__fields {
+      grid-template-columns: 1fr;
+    }
+    .ticket__lead :global(.mark) {
+      display: none;
+    }
+    .ticket__foot {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>

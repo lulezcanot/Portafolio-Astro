@@ -1,0 +1,144 @@
+---
+import { marquee, skills } from '../data/profile';
+---
+
+<section class="stack on-ink seam" id="stack" aria-labelledby="stack-title">
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      {
+        [0, 1].map(() => (
+          <ul class="marquee__row">
+            {marquee.map((m) => (
+              <li>
+                {m}
+                <span class="marquee__sep"></span>
+              </li>
+            ))}
+          </ul>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="stack__inner">
+    <h2 class="stack__title" id="stack-title">Stack</h2>
+    <ul class="groups">
+      {
+        skills.map((g, i) => (
+          <li class="group" data-reveal style={`--i:${i % 3}`}>
+            <h3 class="group__name">{g.group}</h3>
+            <ul class="group__items">
+              {g.items.map((s) => (
+                <li class="data">{s}</li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .stack {
+    --seam: var(--board);
+    position: relative;
+    background: var(--ink);
+    color: var(--board);
+    padding-block: clamp(3rem, 6vw, 5rem) clamp(4rem, 8vw, 6.5rem);
+    overflow: hidden;
+  }
+  .marquee {
+    border-block: 4px solid var(--tape);
+    padding-block: 1rem;
+    overflow: hidden;
+    color: var(--tape);
+  }
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: slide 38s linear infinite;
+  }
+  .marquee__row {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .marquee__row li {
+    display: flex;
+    align-items: center;
+    font-family: var(--font-display), sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-size: var(--step-4);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .marquee__sep {
+    width: 0.9rem;
+    height: 0.9rem;
+    margin-inline: clamp(1.4rem, 3vw, 2.6rem);
+    background: var(--board);
+    transform: rotate(45deg);
+  }
+  @keyframes slide {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .marquee:hover .marquee__track {
+      animation-play-state: paused;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+
+  .stack__inner {
+    max-width: 82rem;
+    margin: clamp(2.5rem, 5vw, 4rem) auto 0;
+    padding-inline: var(--gutter);
+  }
+  .stack__title {
+    font-size: var(--step-3);
+    margin-bottom: clamp(1.6rem, 3vw, 2.4rem);
+  }
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2.4rem 2rem;
+  }
+  .group {
+    border-top: 3px solid var(--board);
+    padding-top: 0.9rem;
+  }
+  .group__name {
+    font-size: var(--step-1);
+    line-height: 1;
+    margin-bottom: 0.9rem;
+  }
+  .group__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+  .group__items li {
+    padding: 0.2rem 0.55rem;
+    border: 2px solid var(--board);
+    font-weight: 700;
+  }
+
+  @media (max-width: 900px) {
+    .groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .groups {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
